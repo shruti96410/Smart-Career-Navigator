@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+<h2>🎯 Career Result</h2>
+
+<div class="result-box">
+<h3>{{ result }}</h3>
+
+<p><b>Why?</b> {{ explanation }}</p>
+<p><b>Description:</b> {{ info.desc }}</p>
+<p><b>Skills:</b> {{ info.skills }}</p>
+
+<h4>Skill Gap:</h4>
+<ul>
+{% for s in missing %}
+<li>{{ s }}</li>
+{% endfor %}
+</ul>
+
+<h4>Roadmap:</h4>
+<p>{{ roadmap }}</p>
+
+<a href="{{ info.link }}" target="_blank" class="learn-btn">Explore</a>
+</div>
+
+<br>
+<a href="/">Try Again</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Career Navigator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>🚀 Smart Career Navigator</h2>
+
+    <form action="/predict" method="POST">
+        <input name="interest" placeholder="Enter interest" required>
+        <input name="skills" placeholder="Enter skills" required>
+        <button>Find My Career</button>
+    </form>
+
+    <br>
+    <a href="/logout">Logout</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.container {
+    width: 380px;
+    margin: 80px auto;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+
+    color: white;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.result-box {
+    background: rgba(255,255,255,0.2);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.learn-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px;
+    background: green;
+    color: white;
+    text-decoration: none;
+}
