@@ -153,5 +153,23 @@ def logout():
     session.clear()
     return redirect(url_for('home'))
 
+
+@app.route('/chatbot', methods=['POST'])
+def chatbot():
+    user_msg = request.form.get('message').lower()
+
+    if "career" in user_msg:
+        reply = "You can explore Software Development, Data Science, or UI/UX based on your skills."
+    elif "data" in user_msg:
+        reply = "For Data Science, learn Python, Statistics, and Machine Learning."
+    elif "developer" in user_msg:
+        reply = "For Software Developer, learn Python, DSA, and Web Development."
+    elif "design" in user_msg:
+        reply = "For UI/UX, learn Figma, design principles, and user experience."
+    else:
+        reply = "Ask me about careers, skills, or learning paths!"
+
+    return {"response": reply}
+
 if __name__ == '__main__':
     app.run(debug=True)

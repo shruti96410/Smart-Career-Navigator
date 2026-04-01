@@ -9,6 +9,7 @@
 <div class="container">
     <h2>🚀 Smart Career Navigator</h2>
 
+    <!-- Career Form -->
     <form action="/predict" method="POST">
         <input name="interest" placeholder="Enter interest" required>
         <input name="skills" placeholder="Enter skills" required>
@@ -16,8 +17,41 @@
     </form>
 
     <br>
+
+    <!-- 🤖 Chatbot Section -->
+    <div class="result-box">
+        <h3>🤖 Career Chatbot</h3>
+
+        <input type="text" id="msg" placeholder="Ask something like 'career in data'">
+
+        <button type="button" onclick="sendMsg()">Send</button>
+
+        <p id="reply"></p>
+    </div>
+
+    <br>
+
     <a href="/logout">Logout</a>
 </div>
+
+<!-- Chatbot Script -->
+<script>
+function sendMsg() {
+    let msg = document.getElementById("msg").value;
+
+    fetch("/chatbot", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "message=" + msg
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("reply").innerText = data.response;
+    });
+}
+</script>
 
 </body>
 </html>
