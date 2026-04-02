@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
-import bcrypt
+import os
 
 app = Flask(__name__)
 app.secret_key = 'secret123'
 
+
+# ---------------- DATABASE ---------------- #
 def init_db():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -12,7 +14,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
-            password BLOB
+            password TEXT
         )
     ''')
     conn.commit()
@@ -20,25 +22,29 @@ def init_db():
 
 init_db()
 
+
+# ---------------- ROUTES ---------------- #
+
 @app.route('/')
 def home():
     return render_template('login.html')
 
+
 @app.route('/signup')
 def signup_page():
     return render_template('signup.html')
+
 
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form['username']
     password = request.form['password']
 
-    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
+
     try:
-        c.execute("INSERT INTO users VALUES (NULL, ?, ?)", (username, hashed))
+        c.execute("INSERT INTO users VALUES (NULL, ?, ?)", (username, password))
         conn.commit()
     except:
         return "User already exists"
@@ -47,11 +53,13 @@ def signup():
 
     return redirect(url_for('home'))
 
+
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
     password = request.form['password']
 
+    # Admin login
     if username == 'admin' and password == 'admin':
         session['admin'] = True
         return redirect(url_for('admin'))
@@ -62,11 +70,12 @@ def login():
     user = c.fetchone()
     conn.close()
 
-    if user and bcrypt.checkpw(password.encode('utf-8'), user[0]):
+    if user and password == user[0]:
         session['user'] = username
         return render_template('index.html')
     else:
         return "Invalid credentials"
+
 
 @app.route('/admin')
 def admin():
@@ -79,9 +88,10 @@ def admin():
     users = c.fetchall()
     conn.close()
 
-    total_users = len(users)
+    return render_template('admin.html', users=users, total=len(users))
 
-    return render_template('admin.html', users=users, total=total_users)
+
+# ---------------- CAREER PREDICTION ---------------- #
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -136,7 +146,7 @@ def predict():
     roadmap = {
         "Software Developer": "Python → DSA → Projects",
         "UI/UX Designer": "Figma → UX → Portfolio",
-        "Data Scientist": "Python → Stats → ML"
+        "Data Scientist": "Python → Statistics → ML"
     }
 
     return render_template(
@@ -148,11 +158,8 @@ def predict():
         roadmap=roadmap.get(result)
     )
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('home'))
 
+# ---------------- CHATBOT ---------------- #
 
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
@@ -165,11 +172,22 @@ def chatbot():
     elif "developer" in user_msg:
         reply = "For Software Developer, learn Python, DSA, and Web Development."
     elif "design" in user_msg:
-        reply = "For UI/UX, learn Figma, design principles, and user experience."
+        reply = "For UI/UX, learn Figma and design principles."
     else:
         reply = "Ask me about careers, skills, or learning paths!"
 
     return {"response": reply}
 
+
+# ---------------- LOGOUT ---------------- #
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
+
+# ---------------- RUN APP ---------------- #
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
