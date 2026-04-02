@@ -1,3 +1,5 @@
 flask
-bcrypt
-gunicorn 
+gunicorn
+scikit-learn
+pandas
+numpy
