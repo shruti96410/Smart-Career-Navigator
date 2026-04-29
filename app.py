@@ -1,145 +1,143 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+from collections import Counter
 
 st.set_page_config(layout="wide")
 
-# ---------------- DARK THEME ---------------- #
+# ---------------- SESSION STATE ---------------- #
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# ---------------- CUSTOM DARK UI ---------------- #
 st.markdown("""
 <style>
-body {background-color:#0D0F1A; color:white;}
-.block-container {padding: 2rem;}
-.card {
-    background:#181C34;
-    padding:20px;
-    border-radius:16px;
-    border:1px solid #252A47;
+body {
+    background: linear-gradient(135deg, #0f172a, #020617);
+    color: #e5e7eb;
+    font-family: 'Segoe UI';
 }
-.title {
-    font-size:26px;
-    font-weight:800;
+.card {
+    background: rgba(30, 41, 59, 0.6);
+    padding: 20px;
+    border-radius: 16px;
+    margin: 10px;
+    border: 1px solid rgba(148,163,184,0.2);
+}
+.row {
+    display: flex;
 }
 .metric {
-    font-size:28px;
-    font-weight:700;
+    font-size: 26px;
+    font-weight: bold;
 }
-.small {color:#9CA3AF; font-size:13px;}
+.small {
+    color: #94a3b8;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- SIDEBAR ---------------- #
-st.sidebar.title("🚀 Smart Career Navigator")
-menu = st.sidebar.radio("Menu", ["Dashboard", "Career"])
+# ---------------- TITLE ---------------- #
+st.markdown("<h1>🚀 Smart Career Navigator</h1>", unsafe_allow_html=True)
 
-# ---------------- DASHBOARD ---------------- #
-if menu == "Dashboard":
+# ---------------- INPUT ---------------- #
+st.subheader("Enter Your Profile")
 
-    # TOPBAR
-    col1, col2 = st.columns([6,2])
-    col1.markdown('<div class="title">Progress Dashboard</div>', unsafe_allow_html=True)
-    col2.write("📅 April 2026")
+interest = st.text_input("Interest")
+skills_input = st.text_input("Skills (comma separated)")
 
-    st.markdown("---")
+# ---------------- CAREER DATABASE ---------------- #
+career_db = {
+    "Data Scientist": ["python", "data", "statistics", "ml"],
+    "Backend Developer": ["java", "api", "spring"],
+    "Frontend Developer": ["html", "css", "react"],
+    "AI/ML Engineer": ["python", "ml", "deep learning"],
+}
 
-    # ---------------- STAT CARDS ---------------- #
-    c1, c2, c3, c4 = st.columns(4)
+roadmap = {
+    "Data Scientist": ["Learn Python", "Statistics", "Machine Learning", "Projects"],
+    "Backend Developer": ["Learn Java", "Spring Boot", "APIs", "Projects"],
+    "Frontend Developer": ["HTML/CSS", "JavaScript", "React", "Projects"],
+    "AI/ML Engineer": ["Python", "ML", "DL", "Deployment"],
+}
 
-    with c1:
-        st.markdown('<div class="card"><div class="small">Career Readiness</div><div class="metric">75%</div></div>', unsafe_allow_html=True)
+# ---------------- ANALYZE ---------------- #
+if st.button("Analyze Career"):
 
-    with c2:
-        st.markdown('<div class="card"><div class="small">Skills Acquired</div><div class="metric">14</div></div>', unsafe_allow_html=True)
+    skills = [s.strip().lower() for s in skills_input.split(",")]
 
-    with c3:
-        st.markdown('<div class="card"><div class="small">Milestones</div><div class="metric">6</div></div>', unsafe_allow_html=True)
+    best_match = None
+    best_score = 0
+    missing_skills = []
 
-    with c4:
-        st.markdown('<div class="card"><div class="small">Learning Streak</div><div class="metric">12d</div></div>', unsafe_allow_html=True)
+    for career, req_skills in career_db.items():
+        score = len(set(skills) & set(req_skills))
+        if score > best_score:
+            best_score = score
+            best_match = career
+            missing_skills = list(set(req_skills) - set(skills))
 
-    st.markdown("###")
+    readiness = int((best_score / len(career_db[best_match])) * 100) if best_match else 50
 
-    # ---------------- MID SECTION ---------------- #
-    left, right = st.columns([2,1])
+    # Save history
+    st.session_state.history.append(best_match)
 
-    # SKILLS
-    with left:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Skill Completion Tracker")
+    # ---------------- DASHBOARD ---------------- #
+    col1, col2, col3 = st.columns(3)
 
-        skills = {
-            "Python":85,
-            "Machine Learning":70,
-            "SQL":60,
-            "Deep Learning":45,
-            "React":55,
-            "NLP":30
-        }
+    with col1:
+        st.markdown(f'<div class="card"><div class="small">Career</div><div class="metric">{best_match}</div></div>', unsafe_allow_html=True)
 
-        for skill, val in skills.items():
-            st.write(skill)
-            st.progress(val)
+    with col2:
+        st.markdown(f'<div class="card"><div class="small">Readiness</div><div class="metric">{readiness}%</div></div>', unsafe_allow_html=True)
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    with col3:
+        st.markdown(f'<div class="card"><div class="small">Skills Entered</div><div class="metric">{len(skills)}</div></div>', unsafe_allow_html=True)
 
-    # CIRCLE (SIMULATED)
-    with right:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Overall Readiness")
+    # ---------------- SKILL GAP ---------------- #
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.subheader("Skill Gap")
+    for m in missing_skills:
+        st.write("❌", m)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # ---------------- ROADMAP ---------------- #
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.subheader("Roadmap")
+    for step in roadmap[best_match]:
+        st.write("✔", step)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # ---------------- CHARTS ---------------- #
+    col4, col5 = st.columns(2)
+
+    # BAR CHART
+    with col4:
+        st.subheader("Skill Match")
+        labels = ["Matched", "Missing"]
+        values = [best_score, len(missing_skills)]
 
         fig, ax = plt.subplots()
-        ax.pie([75,25], labels=["",""], autopct='%1.0f%%')
+        ax.bar(labels, values)
         st.pyplot(fig)
 
-        st.write("AI/ML Engineer")
-        st.caption("Target Role Match")
+    # PIE CHART
+    with col5:
+        st.subheader("Readiness Distribution")
+        fig2, ax2 = plt.subplots()
+        ax2.pie([readiness, 100 - readiness], labels=["Ready", "Remaining"], autopct="%1.0f%%")
+        st.pyplot(fig2)
 
-        st.markdown('</div>', unsafe_allow_html=True)
+# ---------------- HISTORY DASHBOARD ---------------- #
+if st.session_state.history:
+    st.subheader("📊 Career Recommendation History")
 
-    st.markdown("###")
+    counts = Counter(st.session_state.history)
 
-    # ---------------- BOTTOM ---------------- #
-    left2, right2 = st.columns(2)
+    fig3, ax3 = plt.subplots()
+    ax3.bar(counts.keys(), counts.values())
+    st.pyplot(fig3)
 
-    # ROADMAP
-    with left2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Next Roadmap Steps")
-
-        st.write("✔ Python Fundamentals (Done)")
-        st.write("🔵 ML Algorithms (Active)")
-        st.write("⚪ Deep Learning (Pending)")
-        st.write("⚪ NLP Models (Pending)")
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # GOALS + MILESTONES
-    with right2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Weekly Goals")
-
-        st.write("✔ Pandas tutorial (Mon)")
-        st.write("✔ Linear regression (Tue)")
-        st.write("✔ Neural networks (Wed)")
-        st.write("⬜ SQL practice (Thu)")
-        st.write("⬜ GitHub project (Fri)")
-
-        st.subheader("Milestones")
-        st.write("🚀 First Step")
-        st.write("🔥 7-Day Streak")
-        st.write("🧠 ML Learner")
-        st.write("🏅 Deep Diver (Locked)")
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# ---------------- CAREER PAGE ---------------- #
-elif menu == "Career":
-    st.title("Career Recommendation")
-
-    interest = st.text_input("Interest")
-    skills = st.text_input("Skills (comma separated)")
-
-    if st.button("Analyze"):
-        st.success("Recommended: Data Scientist")
-        st.info("Based on your skills")
-        st.warning("Missing: Machine Learning")
-
-        st.progress(60)
+# ---------------- RESET ---------------- #
+if st.button("Reset"):
+    st.session_state.clear()
+    st.experimental_rerun()
