@@ -12,27 +12,60 @@ if "selected_career" not in st.session_state:
 st.markdown("""
 <style>
 
-/* Global Dark Theme */
+/* -------- GLOBAL FORCE -------- */
 html, body, [class*="css"] {
     background-color: #0B0D17 !important;
-    color: #E8EAF6 !important;
+    color: #FFFFFF !important;
     font-family: 'DM Sans', sans-serif;
 }
 
-/* Force readable text */
+/* Force ALL text */
 * {
-    color: #E8EAF6 !important;
+    color: #F1F5FF !important;
 }
 
 /* Headings */
-h1, h2, h3 {
+h1, h2, h3, h4, h5, h6 {
     color: #FFFFFF !important;
     font-weight: 800 !important;
+}
+
+/* Paragraphs & labels */
+p, span, div, label {
+    color: #E2E8F0 !important;
+}
+
+/* Fix Streamlit specific text */
+.stMarkdown, .stText, .stSubheader, .stHeader {
+    color: #FFFFFF !important;
 }
 
 /* Sidebar */
 section[data-testid="stSidebar"] {
     background-color: #12152A !important;
+}
+section[data-testid="stSidebar"] * {
+    color: #E2E8F0 !important;
+}
+
+/* Radio & select labels */
+div[role="radiogroup"] label {
+    color: #FFFFFF !important;
+}
+
+/* Buttons */
+.stButton>button {
+    background: linear-gradient(135deg, #6366F1, #8B8FFF) !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    border-radius: 10px;
+    border: none;
+}
+
+/* Input fields */
+input, textarea {
+    color: #FFFFFF !important;
+    background-color: #1E223F !important;
 }
 
 /* Cards */
@@ -41,21 +74,21 @@ section[data-testid="stSidebar"] {
     padding: 20px;
     border-radius: 16px;
     border: 1px solid #2F355F;
-    margin-bottom: 15px;
 }
 
-/* Buttons */
-.stButton>button {
-    background: linear-gradient(135deg, #6366F1, #8B8FFF);
-    color: white !important;
-    font-weight: 700;
-    border-radius: 10px;
-    border: none;
+/* Charts text fix */
+svg text {
+    fill: #FFFFFF !important;
 }
 
-/* Labels */
-label {
-    color: #E8EAF6 !important;
+/* Checkbox text */
+.stCheckbox label {
+    color: #FFFFFF !important;
+}
+
+/* Remove faint grey */
+.css-1d391kg, .css-1v0mbdj {
+    color: #FFFFFF !important;
 }
 
 </style>
