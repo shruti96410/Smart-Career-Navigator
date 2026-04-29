@@ -1,189 +1,198 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 
 # ---------------- PAGE CONFIG ----------------
-st.set_page_config(page_title="Smart Career Navigator", layout="wide")
+st.set_page_config(
+    page_title="Smart Career Navigator",
+    layout="wide"
+)
 
-# ---------------- CUSTOM CSS (DARK UI) ----------------
+# ---------------- CUSTOM DARK CSS ----------------
 st.markdown("""
 <style>
-body {
-    background-color: #0D0F1A;
-    color: #E8EAF6;
+
+/* Global */
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #0B0D17;
+    color: #FFFFFF;
 }
 
-.sidebar .sidebar-content {
-    background-color: #13162A;
-}
-
+/* Headings */
 h1, h2, h3 {
-    color: #E8EAF6;
-    font-weight: 800;
+    font-weight: 800 !important;
+    color: #FFFFFF !important;
 }
 
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: #12152A;
+    border-right: 1px solid #2F355F;
+}
+
+/* Cards */
 .card {
-    background: #181C34;
+    background: #1E223F;
     padding: 20px;
     border-radius: 16px;
-    border: 1px solid #252A47;
-    margin-bottom: 15px;
+    border: 1px solid #2F355F;
+    transition: 0.3s;
+}
+.card:hover {
+    transform: translateY(-5px);
+    border-color: #6366F1;
+}
+
+/* Buttons */
+.stButton>button {
+    background: linear-gradient(135deg, #6366F1, #8B8FFF);
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+}
+
+/* Text */
+.small-text {
+    color: #C7C9D9;
+    font-size: 14px;
 }
 
 .metric {
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 26px;
+    font-weight: 800;
+    color: #8B8FFF;
 }
 
-.tag {
-    background: #252A47;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    margin-right: 5px;
-}
-
-.button-primary {
-    background: #6366F1;
-    color: white;
-    padding: 8px;
-    border-radius: 8px;
-}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------- SIDEBAR ----------------
 st.sidebar.markdown("## 🚀 Smart Career Navigator")
-page = st.sidebar.radio(
-    "Navigation",
-    ["🏠 Home", "🧭 Career Paths", "📊 Dashboard"]
-)
+page = st.sidebar.radio("Navigation", ["Home", "Career Paths", "Dashboard"])
 
-# ---------------- HOME PAGE ----------------
-if page == "🏠 Home":
-
-    st.markdown("## 👋 Welcome back, Shruti!")
-    st.caption("Your career journey continues — keep going!")
+# ---------------- HOME ----------------
+if page == "Home":
+    st.title("Welcome back, Shruti! 👋")
+    st.markdown("<div class='small-text'>Your career journey continues — keep going 🚀</div>", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.markdown('<div class="card"><div class="metric">75%</div>Career Readiness</div>', unsafe_allow_html=True)
+        st.markdown("<div class='card'>🎯 Career Readiness<div class='metric'>75%</div></div>", unsafe_allow_html=True)
+
     with col2:
-        st.markdown('<div class="card"><div class="metric">14</div>Skills Acquired</div>', unsafe_allow_html=True)
+        st.markdown("<div class='card'>✅ Skills<div class='metric'>14</div></div>", unsafe_allow_html=True)
+
     with col3:
-        st.markdown('<div class="card"><div class="metric">6</div>Milestones</div>', unsafe_allow_html=True)
+        st.markdown("<div class='card'>🏆 Milestones<div class='metric'>6</div></div>", unsafe_allow_html=True)
+
     with col4:
-        st.markdown('<div class="card"><div class="metric">12d</div>Streak</div>', unsafe_allow_html=True)
+        st.markdown("<div class='card'>🔥 Streak<div class='metric'>12d</div></div>", unsafe_allow_html=True)
 
     st.markdown("### 🎯 Target Career")
     st.markdown("""
-    <div class="card">
-        <h3>🤖 AI / ML Engineer</h3>
-        <p>Based on your profile and interests</p>
-        <b>Match: 75%</b>
+    <div class='card'>
+        🤖 <b>AI / ML Engineer</b><br>
+        <span class='small-text'>Based on your profile</span><br><br>
+        <b>75% Match</b>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("### 📌 Today's Tasks")
-    st.markdown("""
-    <div class="card">📚 Continue Machine Learning Module (45 min)</div>
-    <div class="card">🧪 Practice SQL Joins (30 min)</div>
-    <div class="card">📝 Submit Mini Project (1 hr)</div>
-    """, unsafe_allow_html=True)
-
-
 # ---------------- CAREER PATHS ----------------
-elif page == "🧭 Career Paths":
-
-    st.markdown("## 🧭 Career Paths")
-    st.caption("Explore careers matched to your skills")
+elif page == "Career Paths":
+    st.title("🧭 Career Paths")
+    st.markdown("<div class='small-text'>Explore careers based on your skills</div>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
 
-    def career_card(title, desc, match, skills):
-        st.markdown(f"""
-        <div class="card">
-            <h3>{title}</h3>
-            <p>{desc}</p>
-            <b>Match: {match}%</b><br><br>
-            {" ".join([f'<span class="tag">{s}</span>' for s in skills])}
+    with col1:
+        st.markdown("""
+        <div class='card'>
+        ⭐ <b>AI / ML Engineer</b><br>
+        <div class='small-text'>Machine learning & AI systems</div><br>
+        Match: <b>75%</b>
         </div>
         """, unsafe_allow_html=True)
-
-    with col1:
-        career_card("🤖 AI/ML Engineer",
-                    "Build intelligent systems",
-                    75,
-                    ["Python", "ML", "NLP"])
+        st.button("Explore", key="ai")
 
     with col2:
-        career_card("📊 Data Analyst",
-                    "Analyze and visualize data",
-                    68,
-                    ["SQL", "Excel", "Power BI"])
+        st.markdown("""
+        <div class='card'>
+        📊 <b>Data Analyst</b><br>
+        <div class='small-text'>Data insights & visualization</div><br>
+        Match: <b>68%</b>
+        </div>
+        """, unsafe_allow_html=True)
+        st.button("Explore", key="data")
 
     with col3:
-        career_card("🌐 Web Developer",
-                    "Build web applications",
-                    55,
-                    ["HTML", "JS", "React"])
-
-    col4, col5, col6 = st.columns(3)
-
-    with col4:
-        career_card("🔐 Cybersecurity",
-                    "Secure systems",
-                    45,
-                    ["Linux", "Networking"])
-
-    with col5:
-        career_card("☁️ Cloud Engineer",
-                    "Manage cloud infra",
-                    50,
-                    ["AWS", "Docker"])
-
-    with col6:
-        career_card("📱 App Developer",
-                    "Build mobile apps",
-                    40,
-                    ["Flutter", "Java"])
-
+        st.markdown("""
+        <div class='card'>
+        🌐 <b>Web Developer</b><br>
+        <div class='small-text'>Frontend & backend dev</div><br>
+        Match: <b>55%</b>
+        </div>
+        """, unsafe_allow_html=True)
+        st.button("Explore", key="web")
 
 # ---------------- DASHBOARD ----------------
-elif page == "📊 Dashboard":
+elif page == "Dashboard":
+    st.title("📊 Progress Dashboard")
 
-    st.markdown("## 📊 Progress Dashboard")
-
+    # ---- ROW 1: BAR + PIE ----
     col1, col2 = st.columns(2)
 
+    # BAR CHART
     with col1:
-        st.markdown("### 📈 Skill Progress")
-        st.progress(85)
-        st.write("Python")
+        st.subheader("Skill Levels")
 
-        st.progress(70)
-        st.write("Machine Learning")
+        skills = ["Python", "ML", "SQL", "DL", "React"]
+        values = [85, 70, 60, 45, 55]
 
-        st.progress(60)
-        st.write("SQL")
+        fig, ax = plt.subplots(figsize=(8,5))
+        ax.bar(skills, values)
+        ax.set_ylabel("Percentage")
+        ax.set_title("Skill Progress")
 
-        st.progress(45)
-        st.write("Deep Learning")
+        st.pyplot(fig, use_container_width=True)
 
+    # PIE CHART
     with col2:
-        st.markdown("### 🎯 Readiness")
-        st.metric(label="Career Readiness", value="75%")
+        st.subheader("Career Readiness")
 
+        labels = ["Completed", "Remaining"]
+        sizes = [75, 25]
+
+        fig2, ax2 = plt.subplots(figsize=(6,5))
+        ax2.pie(sizes, labels=labels, autopct='%1.1f%%')
+        ax2.set_title("Overall Readiness")
+
+        st.pyplot(fig2, use_container_width=True)
+
+    # ---- FULL WIDTH LINE CHART ----
+    st.markdown("### 📈 Weekly Learning Trend")
+
+    days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+    hours = [2, 3, 1.5, 2.5, 3]
+
+    fig3, ax3 = plt.subplots(figsize=(10,4))
+    ax3.plot(days, hours, marker='o')
+    ax3.set_ylabel("Hours")
+    ax3.set_title("Learning Hours")
+
+    st.pyplot(fig3, use_container_width=True)
+
+    # ---- GOALS ----
+    st.markdown("### ✅ Weekly Goals")
+
+    st.checkbox("Complete Pandas tutorial", True)
+    st.checkbox("Build ML model", True)
+    st.checkbox("Practice SQL joins", False)
+
+    # ---- ROADMAP ----
     st.markdown("### 🗺️ Roadmap")
-    st.markdown("""
-    - ✅ Python Fundamentals  
-    - 🔄 ML Algorithms  
-    - ⏳ Deep Learning  
-    - ⏳ NLP  
-    """)
 
-    st.markdown("### 🏆 Milestones")
-    st.markdown("""
-    🚀 First Step  
-    🔥 7-Day Streak  
-    🧠 ML Learner  
-    """)
+    st.write("✔ Python Fundamentals")
+    st.write("🔄 Machine Learning (In Progress)")
+    st.write("⏳ Deep Learning (Upcoming)")
