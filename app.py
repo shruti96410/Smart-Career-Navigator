@@ -1,172 +1,145 @@
-
 import streamlit as st
-import sqlite3
+import matplotlib.pyplot as plt
 
-# ---------------- DATABASE ---------------- #
-def init_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE,
-            password TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+st.set_page_config(layout="wide")
 
-init_db()
+# ---------------- DARK THEME ---------------- #
+st.markdown("""
+<style>
+body {background-color:#0D0F1A; color:white;}
+.block-container {padding: 2rem;}
+.card {
+    background:#181C34;
+    padding:20px;
+    border-radius:16px;
+    border:1px solid #252A47;
+}
+.title {
+    font-size:26px;
+    font-weight:800;
+}
+.metric {
+    font-size:28px;
+    font-weight:700;
+}
+.small {color:#9CA3AF; font-size:13px;}
+</style>
+""", unsafe_allow_html=True)
 
-# ---------------- AUTH ---------------- #
+# ---------------- SIDEBAR ---------------- #
+st.sidebar.title("🚀 Smart Career Navigator")
+menu = st.sidebar.radio("Menu", ["Dashboard", "Career"])
 
-def signup(username, password):
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    try:
-        c.execute("INSERT INTO users VALUES (NULL, ?, ?)", (username, password))
-        conn.commit()
-        return True
-    except:
-        return False
-    finally:
-        conn.close()
+# ---------------- DASHBOARD ---------------- #
+if menu == "Dashboard":
 
+    # TOPBAR
+    col1, col2 = st.columns([6,2])
+    col1.markdown('<div class="title">Progress Dashboard</div>', unsafe_allow_html=True)
+    col2.write("📅 April 2026")
 
-def login(username, password):
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute("SELECT password FROM users WHERE username=?", (username,))
-    user = c.fetchone()
-    conn.close()
+    st.markdown("---")
 
-    if user and password == user[0]:
-        return True
-    return False
+    # ---------------- STAT CARDS ---------------- #
+    c1, c2, c3, c4 = st.columns(4)
 
+    with c1:
+        st.markdown('<div class="card"><div class="small">Career Readiness</div><div class="metric">75%</div></div>', unsafe_allow_html=True)
 
-# ---------------- SESSION ---------------- #
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+    with c2:
+        st.markdown('<div class="card"><div class="small">Skills Acquired</div><div class="metric">14</div></div>', unsafe_allow_html=True)
 
-if "username" not in st.session_state:
-    st.session_state.username = ""
+    with c3:
+        st.markdown('<div class="card"><div class="small">Milestones</div><div class="metric">6</div></div>', unsafe_allow_html=True)
 
-# ---------------- UI ---------------- #
+    with c4:
+        st.markdown('<div class="card"><div class="small">Learning Streak</div><div class="metric">12d</div></div>', unsafe_allow_html=True)
 
-st.title("🚀 Smart Career Navigator")
+    st.markdown("###")
 
-menu = ["Login", "Signup"]
-choice = st.sidebar.selectbox("Menu", menu)
+    # ---------------- MID SECTION ---------------- #
+    left, right = st.columns([2,1])
 
-# ---------------- SIGNUP ---------------- #
-if choice == "Signup":
-    st.subheader("Create Account")
-    user = st.text_input("Username")
-    pwd = st.text_input("Password", type="password")
+    # SKILLS
+    with left:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("Skill Completion Tracker")
 
-    if st.button("Signup"):
-        if signup(user, pwd):
-            st.success("Account created successfully!")
-        else:
-            st.error("User already exists")
-
-# ---------------- LOGIN ---------------- #
-elif choice == "Login":
-    st.subheader("Login")
-    user = st.text_input("Username")
-    pwd = st.text_input("Password", type="password")
-
-    if st.button("Login"):
-        if login(user, pwd):
-            st.session_state.logged_in = True
-            st.session_state.username = user
-            st.success("Login successful!")
-        else:
-            st.error("Invalid credentials")
-
-# ---------------- MAIN APP ---------------- #
-if st.session_state.logged_in:
-
-    st.subheader(f"Welcome, {st.session_state.username}")
-
-    interest = st.text_input("Enter your interests")
-    skills = st.text_input("Enter your skills")
-
-    if st.button("Find My Career"):
-
-        if "code" in skills.lower():
-            result = "Software Developer"
-        elif "design" in interest.lower():
-            result = "UI/UX Designer"
-        elif "data" in skills.lower():
-            result = "Data Scientist"
-        else:
-            result = "Explore Multiple Fields"
-
-        st.success(f"🎯 Recommended Career: {result}")
-
-        career_info = {
-            "Software Developer": {
-                "desc": "Builds applications and systems.",
-                "skills": "Python, Java, DSA, Web Dev",
-                "link": "https://roadmap.sh/software-engineer"
-            },
-            "UI/UX Designer": {
-                "desc": "Designs user-friendly interfaces.",
-                "skills": "Figma, UX, Creativity",
-                "link": "https://roadmap.sh/design"
-            },
-            "Data Scientist": {
-                "desc": "Analyzes data and builds models.",
-                "skills": "Python, ML, SQL",
-                "link": "https://roadmap.sh/data-scientist"
-            },
-            "Explore Multiple Fields": {
-                "desc": "Explore domains.",
-                "skills": "Basic Programming",
-                "link": "https://roadmap.sh"
-            }
+        skills = {
+            "Python":85,
+            "Machine Learning":70,
+            "SQL":60,
+            "Deep Learning":45,
+            "React":55,
+            "NLP":30
         }
 
-        info = career_info.get(result)
+        for skill, val in skills.items():
+            st.write(skill)
+            st.progress(val)
 
-        st.write(f"📘 {info['desc']}")
-        st.write(f"🛠 Required Skills: {info['skills']}")
-        st.markdown(f"[🔗 View Roadmap]({info['link']})")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        # Skill gap
-        required_skills = {
-            "Software Developer": ["python", "dsa", "html"],
-            "UI/UX Designer": ["figma", "design"],
-            "Data Scientist": ["python", "ml"]
-        }
+    # CIRCLE (SIMULATED)
+    with right:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("Overall Readiness")
 
-        user_skills = skills.lower().split()
-        missing = [s for s in required_skills.get(result, []) if s not in user_skills]
+        fig, ax = plt.subplots()
+        ax.pie([75,25], labels=["",""], autopct='%1.0f%%')
+        st.pyplot(fig)
 
-        if missing:
-            st.warning(f"⚠ Missing Skills: {', '.join(missing)}")
+        st.write("AI/ML Engineer")
+        st.caption("Target Role Match")
 
-    # ---------------- CHATBOT ---------------- #
-    st.subheader("💬 Chatbot")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    msg = st.text_input("Ask something...")
+    st.markdown("###")
 
-    if st.button("Send"):
-        if "career" in msg.lower():
-            st.write("Explore Software Dev, Data Science, or UI/UX.")
-        elif "data" in msg.lower():
-            st.write("Learn Python, Statistics, and ML.")
-        elif "developer" in msg.lower():
-            st.write("Learn Python, DSA, Web Dev.")
-        elif "design" in msg.lower():
-            st.write("Learn Figma and UX.")
-        else:
-            st.write("Ask about careers or skills!")
+    # ---------------- BOTTOM ---------------- #
+    left2, right2 = st.columns(2)
 
-    # ---------------- LOGOUT ---------------- #
-    if st.button("Logout"):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        st.experimental_rerun()
+    # ROADMAP
+    with left2:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("Next Roadmap Steps")
+
+        st.write("✔ Python Fundamentals (Done)")
+        st.write("🔵 ML Algorithms (Active)")
+        st.write("⚪ Deep Learning (Pending)")
+        st.write("⚪ NLP Models (Pending)")
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # GOALS + MILESTONES
+    with right2:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.subheader("Weekly Goals")
+
+        st.write("✔ Pandas tutorial (Mon)")
+        st.write("✔ Linear regression (Tue)")
+        st.write("✔ Neural networks (Wed)")
+        st.write("⬜ SQL practice (Thu)")
+        st.write("⬜ GitHub project (Fri)")
+
+        st.subheader("Milestones")
+        st.write("🚀 First Step")
+        st.write("🔥 7-Day Streak")
+        st.write("🧠 ML Learner")
+        st.write("🏅 Deep Diver (Locked)")
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# ---------------- CAREER PAGE ---------------- #
+elif menu == "Career":
+    st.title("Career Recommendation")
+
+    interest = st.text_input("Interest")
+    skills = st.text_input("Skills (comma separated)")
+
+    if st.button("Analyze"):
+        st.success("Recommended: Data Scientist")
+        st.info("Based on your skills")
+        st.warning("Missing: Machine Learning")
+
+        st.progress(60)
